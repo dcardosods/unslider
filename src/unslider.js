@@ -109,7 +109,8 @@
 							width = el.outerWidth();
 
 						ul.css(styl);
-						styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
+						li.css({width: width});
+						styl['width'] = 'auto';
 						el.css(styl);
 					}, 50);
 				}).resize();
