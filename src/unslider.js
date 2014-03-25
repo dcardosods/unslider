@@ -37,7 +37,7 @@
 
 			_.el = el;
 			_.ul = el.find(_.o.items);
-			_.max = [el.outerWidth() | 0, el.outerHeight() | 0];
+			_.max = [el.outerWidth() | 0, el.outerHeight() | 0, el.css('max-width')];
 			_.li = _.ul.find(_.o.item).each(function(index) {
 				var me = $(this),
 					width = me.outerWidth(),
@@ -59,6 +59,7 @@
 			_.i = 0;
 
 			//  Set the main element
+			if (o.fluid && _.max[2] === 'none') el.css({'max-width': '100%'});
 			el.css({width: _.max[0], height: li.first().outerHeight(), overflow: 'hidden'});
 
 			//  Set the relative widths
