@@ -27,6 +27,7 @@
 			complete: f,    // invoke after animation (function with argument)
 			items: '>ul',   // slides container selector
 			item: '>li',    // slidable items selector
+			visible: 1,     // number of items visible simultaneously
 			easing: 'swing',// easing function to use for animation
 			autoplay: true  // enable autoplay on initialisation
 		};
@@ -63,7 +64,7 @@
 
 			//  Set the relative widths
 			ul.css({position: 'relative', left: 0, width: (len * 100) + '%'});
-			li.css({'float': 'left', width: (_.max[0]) + 'px'});
+			li.css({'float': 'left', width: (_.max[0] / _.o.visible) + 'px'});
 
 			//  Autoslide
 			o.autoplay && setTimeout(function() {
@@ -110,6 +111,7 @@
 
 						ul.css(styl);
 						styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
+						li.css({width: width / o.visible});
 						el.css(styl);
 					}, 50);
 				}).resize();
@@ -130,7 +132,7 @@
 			if (_.t) {
 				_.stop();
 				_.play();
-	                }
+			}
 			var o = _.o,
 				el = _.el,
 				ul = _.ul,
@@ -141,22 +143,23 @@
 			$.isFunction(o.starting) && !callback && o.starting(el, li.eq(current));
 
 			//  To slide or not to slide
-			if ((!target.length || index < 0) && o.loop == f) return;
+			if ((!target.length || index < 0 || index > (li.length - o.visible)) && o.loop == f) return;
 
 			//  Check if it's out of bounds
-			if (!target.length) index = 0;
+			if (!target.length || index > (li.length - o.visible)) index = 0;
 			if (index < 0) index = li.length - 1;
 			target = li.eq(index);
 
 			var speed = callback ? 5 : o.speed | 0,
 				easing = o.easing,
-				obj = {height: target.outerHeight()};
+				obj = {height: target.outerHeight()},
+				left = (index * 100) / o.visible;
 
 			if (!ul.queue('fx').length) {
 				//  Handle those pesky dots
 				el.find('.dot').eq(index).addClass('active').siblings().removeClass('active');
 
-				el.animate(obj, speed, easing) && ul.animate($.extend({left: '-' + index + '00%'}, obj), speed, easing, function(data) {
+				el.animate(obj, speed, easing) && ul.animate($.extend({left: '-' + left + '%'}, obj), speed, easing, function(data) {
 					_.i = index;
 
 					$.isFunction(o.complete) && !callback && o.complete(el, target);
